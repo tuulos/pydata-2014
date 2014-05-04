@@ -604,7 +604,7 @@
 <h3 style="color: #666; text-transform: none;" class="fragment">SELECT sum(a), sum(b) FROM matrix WHERE ...</h3>
 <div class="fragment">
 <h4>⇣</h4>
-<h3 style="color: #666; text-transform: none;">(matrix * diag(chosen-columns)).T.dot(index-vector)</h3>
+<h3 style="color: #666; text-transform: none;">matrix.dot(diag(chosen-columns)).T.dot(index-vector)</h3>
 <h4 style="margin-top: 60px">where chosen-columns has <span style="color: #666">1</span> for each chosen column,
 <span style="color: #666">0</span> otherwise</h4>
 </div>
