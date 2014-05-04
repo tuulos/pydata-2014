@@ -1,0 +1,150 @@
+
+Generate Data:
+
+1 0 0 0 0 1 0 0 0 ...
+  padding   padding
+
+1. Bigger than RAM
+2. Bigger than L2
+3. Bigger than L1
+4. Small
+
+Chart:
+|              - 1
+|
+|--            - 2   C time
+|   --
+|      --      - 3
+|         --   - 4 
+---------------
+  1  2  3  4
+ Numba / Python time
+
+If you can compress data X%, Numba is as fast as C
+If you can compress data X%, Python is as fast as C
+
+-- slide --
+
+Chart
+
+Size
+
+|
+|--- DeliRoll
+|    --- Gzip
+|
+|--------
+
+Time
+
+|
+|    --- Gzip
+|
+|--- DeliRoll
+|--------
+
+
+
+WHY
+
+
+### Scale is an operational issue, not an engineering challenge ###
+
+How to create a PB-scale SQL-compatible data warehouse - easy with immutable data!
+
+Client
+  SQL (reduce)
+  ___________________________________________
+  |                       |                 |
+EC2-instance         EC2-instance         EC2-instance
+[Postgres, day 1]    [Postgres, day 2]    [Postgres, day 3]
+
+### Analysts care about information, not data ###
+
+Producing
+
+{device-identifier: 'apple ios 3984 234 34', campaign-identifier: '2323'}
+{device-identifier: 'apple ios 3984 234 34', campaign-identifier: '2323'}
+{device-identifier: 'apple ios 3984 234 34', campaign-identifier: '2323'}
+
+Raw data: NN bytes, Entropy: 343 bits (4334% overhead)
+
+### Analysts care about latency ###
+
+  Analytics is a memory-bandwidth bound problem, CPUs don't care about entropy
+
+  Pixelcube example, KwH
+
+  Latency is not just a quantitative issue but qualitative
+
+- To summarize
+
+         A   D   O
+Entropy (+) (-) (?)
+Latency (+) (-) (-)
+Volume  (?) (?) (-)
+
+### Developer's job is to maximize information density, minimize scale and latency ###
+
+- Shifting effort from operational side to developer side makes sense:
+
+  Pay a higher upfront cost to get greater benefit over time
+
+  DevOps time is underappreciated
+  Cloud just amplifies the effect since developer time translated directly to lower OPEX
+  Achieving low-latency without getting rid of redundancy is against the laws of physics.
+
+- Why not a 3rd party product:
+
+
+  Entropy is a domain-specific modelling problem - hard to outsource.
+
+  Thanks to the cloud, and advanced high-level languages, we are living a reneissance
+  of custom, domain-specific solutions.
+
+- Recipe for Success:
+  1) Find out real business needs
+  2) Use an expressive high-level language to model the data, minimizing redundancy
+  3) Build lightweight supporting infrastructure using battle-hardened open-source components
+
+  Result: A low-latency, infinitely scalable, easy-to-operate data warehouse which answers
+  exactly to business needs.
+
+WHAT
+
+- Stats from AdRoll: trillion rows, queries per day etc.
+- Overall architecture
+    - Log data -> MapReduce -> DeliRoll server -> deliroll worker -> matrix
+    - Tableau -> Postgres -> Multicorn -> DeliRoll server -> ...
+
+HOW
+
+So how do you model the data exactly?
+
+What's the absolutely most efficient way to utilize CPUs?
+
+Quick intro to IR with Matrices
+
+dot product, diagonal matrix, sparse matrix etc.
+
+why python: dare to implement algorithms you wouldn't dare to implement otherwise
+
+Tricks:
+
+- Dictionary encoding for dimensions
+    - delta encode values
+
+- Dependent fields in bitmaps
+    - viz: sort
+
+- Column compression
+    - chart: max value for a column: spikes
+    - chart: 64-bit, max-bit, varlen, optimal
+    - RLE
+    - Var Len format
+
+- Metaprogramming
+    - Numba function
+    - chart: performance, numba vs. without
+
+
